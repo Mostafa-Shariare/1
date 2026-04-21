@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Socratic Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --ink: #0f0e0c;
+  --ink2: #3d3b36;
+  --ink3: #7a776e;
+  --paper: #faf8f4;
+  --paper2: #f2efe9;
+  --paper3: #e8e4da;
+  --accent: #c8460a;
+  --accent2: #e8622a;
+  --green: #2a7a52;
+  --green-bg: #eaf5ee;
+  --blue: #1e5fa5;
+  --blue-bg: #e8f0fb;
+  --border: #ddd9d0;
+  --radius: 14px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+
+/* ── HEADER ── */
+.header{
+  background:var(--ink);
+  color:var(--paper);
+  padding:1.25rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.header-left{display:flex;align-items:center;gap:14px}
+.logo-mark{
+  width:38px;height:38px;border-radius:8px;
+  background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Playfair Display',serif;font-size:20px;font-weight:700;
+  color:#fff;flex-shrink:0;
+}
+.brand{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;letter-spacing:-.01em}
+.brand span{color:var(--accent2)}
+.tagline{font-size:12px;color:rgba(255,255,255,0.45);margin-top:1px;letter-spacing:.04em;text-transform:uppercase}
+.header-actions{display:flex;gap:8px}
+.btn-reset{
+  background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.65);
+  padding:7px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;
+  transition:all .15s;letter-spacing:.02em
+}
+.btn-reset:hover{border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.07)}
+
+/* ── LAYOUT ── */
+.main{max-width:1100px;margin:0 auto;padding:1.5rem 1.5rem 3rem}
+
+/* ── TOPIC SECTION ── */
+.topic-section{
+  background:var(--ink);
+  border-radius:var(--radius);
+  padding:1.75rem 2rem;
+  margin-bottom:1.25rem;
+  position:relative;overflow:hidden;
+}
+.topic-section::before{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:160px;height:160px;border-radius:50%;
+  background:rgba(200,70,10,0.12);pointer-events:none;
+}
+.topic-section-label{
+  font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,0.38);margin-bottom:1rem;font-weight:500;
+}
+.topic-display{
+  font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:500;
+  color:#fff;line-height:1.4;min-height:2.2rem;margin-bottom:1.25rem;
+}
+.topic-display.empty{color:rgba(255,255,255,0.3);font-style:italic;font-size:1.1rem}
+.topic-input-row{display:flex;gap:10px}
+.topic-input-row input{
+  flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+  border-radius:10px;padding:11px 14px;font-size:14px;color:#fff;font-family:inherit;
+  transition:border-color .15s;outline:none;
+}
+.topic-input-row input::placeholder{color:rgba(255,255,255,0.3)}
+.topic-input-row input:focus{border-color:var(--accent2)}
+.btn-set{
+  background:var(--accent);color:#fff;border:none;border-radius:10px;
+  padding:11px 20px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;
+  white-space:nowrap;transition:background .15s;letter-spacing:.02em;
+}
+.btn-set:hover{background:var(--accent2)}
+
+/* ── TWO COLUMN ── */
+.columns{display:grid;grid-template-columns:1fr 1.6fr;gap:1.25rem;align-items:start}
+
+/* ── STUDENT PANEL ── */
+.card{
+  background:#fff;border:1px solid var(--border);
+  border-radius:var(--radius);padding:1.4rem 1.5rem;
+  box-shadow:var(--shadow);
+}
+.card-title{
+  font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;
+  color:var(--ink);margin-bottom:1.1rem;display:flex;align-items:center;gap:8px;
+}
+.card-icon{
+  width:28px;height:28px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;
+}
+.icon-student{background:#fff5f2;color:var(--accent)}
+.icon-feed{background:#f0f7ff;color:var(--blue)}
+.icon-insights{background:#edf7f2;color:var(--green)}
+
+label{display:block;font-size:12px;font-weight:500;color:var(--ink3);margin-bottom:5px;letter-spacing:.03em;text-transform:uppercase}
+textarea, .text-input{
+  width:100%;border:1px solid var(--border);border-radius:9px;
+  padding:10px 12px;font-size:13.5px;font-family:inherit;color:var(--ink);
+  resize:vertical;transition:border-color .15s;outline:none;background:var(--paper);
+  line-height:1.5;
+}
+textarea:focus,.text-input:focus{border-color:var(--accent);background:#fff}
+.field{margin-bottom:1rem}
+
+/* confidence slider */
+.confidence-row{display:flex;align-items:center;gap:12px;margin-top:4px}
+input[type=range]{
+  -webkit-appearance:none;flex:1;height:4px;border-radius:2px;
+  appearance:none;
+  background:linear-gradient(to right, var(--accent) 0%, var(--accent) var(--pct,60%), var(--border) var(--pct,60%));
+  outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--accent);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.18);
+}
+.conf-badge{
+  font-size:12px;font-weight:500;color:var(--accent);
+  background:#fff5f2;border:1px solid #ffd9cc;
+  border-radius:6px;padding:3px 9px;white-space:nowrap;min-width:52px;text-align:center;
+}
+.divider{border:none;border-top:1px dashed var(--border);margin:1rem 0}
+.hint{font-size:11.5px;color:var(--ink3);margin-top:4px;line-height:1.5}
+.btn-post{
+  width:100%;background:var(--accent);color:#fff;border:none;
+  border-radius:10px;padding:12px;font-size:14px;font-weight:500;cursor:pointer;
+  font-family:inherit;transition:background .15s;letter-spacing:.02em;margin-top:.5rem;
+}
+.btn-post:hover{background:var(--accent2)}
+
+/* ── FEED ── */
+.feed-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.sort-select{
+  font-size:12px;border:1px solid var(--border);border-radius:8px;
+  padding:5px 10px;font-family:inherit;color:var(--ink2);background:var(--paper);
+  cursor:pointer;outline:none;
+}
+.opinions-list{list-style:none;display:flex;flex-direction:column;gap:10px;max-height:600px;overflow-y:auto;padding-right:2px}
+.opinions-list::-webkit-scrollbar{width:4px}
+.opinions-list::-webkit-scrollbar-track{background:var(--paper2)}
+.opinions-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.opinion-item{
+  background:var(--paper);border:1px solid var(--border);border-radius:11px;
+  padding:1rem 1.1rem;transition:box-shadow .15s;
+}
+.opinion-item:hover{box-shadow:0 2px 10px rgba(0,0,0,0.06)}
+.opinion-anon{
+  display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;
+  color:var(--blue);background:var(--blue-bg);border-radius:20px;
+  padding:2px 9px;margin-bottom:.6rem;letter-spacing:.02em;
+}
+.opinion-text{font-size:13.5px;color:var(--ink);line-height:1.55;white-space:pre-wrap}
+.opinion-revision{
+  margin-top:.65rem;padding:.6rem .75rem;
+  background:var(--green-bg);border-left:3px solid var(--green);
+  border-radius:0 8px 8px 0;font-size:12.5px;color:#1e5042;line-height:1.5;
+}
+.opinion-revision-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--green);margin-bottom:3px}
+.opinion-change-reason{
+  margin-top:.5rem;padding:.55rem .75rem;
+  background:#fef9f0;border-left:3px solid #e0a030;
+  border-radius:0 8px 8px 0;font-size:12.5px;color:#5a3e0a;line-height:1.5;
+}
+.opinion-change-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:#c08020;margin-bottom:3px}
+.opinion-meta{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:.7rem;padding-top:.6rem;border-top:1px solid var(--border);
+}
+.opinion-stamp{font-size:11px;color:var(--ink3)}
+.conf-pip{
+  display:inline-flex;gap:3px;align-items:center;margin-left:6px;
+}
+.pip{width:7px;height:7px;border-radius:50%;background:var(--border)}
+.pip.filled{background:var(--accent)}
+.vote-btn{
+  display:flex;align-items:center;gap:5px;
+  background:transparent;border:1px solid var(--border);border-radius:8px;
+  padding:5px 12px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;
+  color:var(--ink2);transition:all .15s;
+}
+.vote-btn:hover{border-color:var(--accent);color:var(--accent);background:#fff5f2}
+.vote-btn.voted{border-color:var(--accent);color:var(--accent);background:#fff5f2}
+.vote-group{display:flex;align-items:center;gap:8px}
+.vote-btn.disagree:hover{border-color:#6d6b64;color:#4f4c44;background:#f1efe9}
+.vote-btn.disagree.voted{border-color:#6d6b64;color:#4f4c44;background:#f1efe9}
+
+/* ── PHASE TABS ── */
+.phase-tabs{display:flex;gap:0;margin-bottom:1.2rem;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--paper2)}
+.phase-tab{flex:1;padding:9px 10px;font-size:12px;font-weight:500;font-family:inherit;border:none;background:transparent;cursor:pointer;color:var(--ink3);transition:all .15s;text-align:center;letter-spacing:.02em}
+.phase-tab.active{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--border)}
+.phase-tab .tab-num{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--border);color:var(--ink3);font-size:10px;margin-right:5px;transition:all .15s}
+.phase-tab.active .tab-num{background:var(--accent);color:#fff}
+.phase-panel{display:none}.phase-panel.active{display:block}
+
+/* ── REFLECTION PROMPTS ── */
+.reflection-section{background:var(--paper2);border:1px solid var(--border);border-radius:11px;padding:1rem 1.1rem;margin-bottom:1rem}
+.reflection-section-title{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--green);margin-bottom:.75rem;display:flex;align-items:center;gap:6px}
+.reflection-section-title::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.prompt-item{margin-bottom:.85rem}
+.prompt-item:last-child{margin-bottom:0}
+.prompt-label{font-size:12px;font-weight:500;color:var(--ink2);margin-bottom:5px;line-height:1.4}
+.prompt-hint{font-size:11px;color:var(--ink3);margin-bottom:5px;font-style:italic}
+.prompt-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.chip{font-size:11.5px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:#fff;color:var(--ink2);cursor:pointer;transition:all .12s;font-family:inherit}
+.chip:hover{border-color:var(--accent);color:var(--accent);background:#fff5f2}
+.chip.selected{border-color:var(--accent);color:#fff;background:var(--accent)}
+
+/* ── MIND-SHIFT METER ── */
+.shift-meter{display:flex;align-items:center;gap:10px;margin-top:5px}
+.shift-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--ink3);margin-top:3px}
+.shift-track{flex:1}
+
+/* ── INSIGHTS ── */
+.insights-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem}
+.insight-stat{
+  background:var(--paper2);border:1px solid var(--border);border-radius:10px;
+  padding:.9rem 1rem;text-align:center;
+}
+.insight-num{font-size:1.5rem;font-weight:500;color:var(--ink);font-family:'Playfair Display',serif}
+.insight-label{font-size:11px;color:var(--ink3);margin-top:3px;line-height:1.4}
+
+.bottom-section{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:1.25rem}
+
+/* ── EMPTY STATE ── */
+.empty-state{
+  text-align:center;padding:2.5rem 1rem;color:var(--ink3);
+  font-size:13.5px;line-height:1.6;
+}
+.empty-icon{font-size:2rem;margin-bottom:.5rem}
+
+/* ── RESPONSIVE ── */
+@media(max-width:720px){
+  .columns{grid-template-columns:1fr}
+  .bottom-section{grid-template-columns:1fr}
+  .main{padding:1rem 1rem 2rem}
+  .topic-section{padding:1.25rem}
+  .header{padding:1rem 1.25rem}
+}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:1.5rem;right:1.5rem;
+  background:var(--ink);color:#fff;
+  padding:10px 18px;border-radius:10px;font-size:13px;
+  opacity:0;transform:translateY(8px);pointer-events:none;
+  transition:opacity .2s,transform .2s;z-index:200;
+}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* ── FADE IN ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.opinion-item{animation:fadeUp .22s ease both}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<header class="header">
+  <div class="header-left">
+    <div class="logo-mark">S</div>
+    <div>
+      <div class="brand">Socratic <span>Board</span></div>
+      <div class="tagline">Anonymous classroom dialogue</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn-reset" id="clearAllBtn">↺ Reset demo</button>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- Topic -->
+  <section class="topic-section">
+    <div class="topic-section-label">Today's question on the board</div>
+    <div class="topic-display empty" id="topicDisplay">No topic set yet — teacher can add one below.</div>
+    <div class="topic-input-row">
+      <input id="topicInput" type="text" placeholder="Type a discussion question or topic..." />
+      <button class="btn-set" id="setTopicBtn">Post to Board</button>
+    </div>
+  </section>
+
+  <!-- Student + Feed -->
+  <div class="columns">
+
+    <!-- Student panel -->
+    <div class="card">
+      <div class="card-title"><span class="card-icon icon-student">✏️</span>Your Anonymous Response</div>
+
+      <div class="phase-tabs">
+        <button class="phase-tab active" id="tab1Btn" onclick="switchPhase(1)"><span class="tab-num">1</span>My Opinion</button>
+        <button class="phase-tab" id="tab2Btn" onclick="switchPhase(2)"><span class="tab-num">2</span>Reflect</button>
+      </div>
+
+      <!-- Phase 1: Initial opinion -->
+      <div class="phase-panel active" id="phase1">
+        <div class="field">
+          <label for="opinionInput">Your initial view</label>
+          <textarea id="opinionInput" rows="4" placeholder="Share your argument, reasoning, or perspective…"></textarea>
+        </div>
+        <div class="field">
+          <label>How confident are you right now?</label>
+          <div class="confidence-row">
+            <input type="range" id="confidenceInput" min="1" max="5" step="1" value="3" />
+            <span class="conf-badge" id="confidenceLabel">3 / 5</span>
+          </div>
+          <div class="shift-labels"><span>Not sure</span><span>Fully confident</span></div>
+        </div>
+        <button class="btn-post" id="postOpinionBtn">Post Anonymously →</button>
+        <p class="hint" style="margin-top:.6rem;text-align:center">After posting, read others' opinions then come back to Reflect →</p>
+      </div>
+
+      <!-- Phase 2: Guided reflection -->
+      <div class="phase-panel" id="phase2">
+
+        <div class="reflection-section">
+          <div class="reflection-section-title">What surprised you?</div>
+          <div class="prompt-item">
+            <div class="prompt-label">Which opinion surprised you most?</div>
+            <div class="prompt-hint">Quick-pick or write your own:</div>
+            <div class="prompt-chips" id="surpriseChips">
+              <span class="chip" data-target="surpriseInput" data-val="An argument I hadn't considered at all">Argument I hadn't considered</span>
+              <span class="chip" data-target="surpriseInput" data-val="Someone who agreed with me had very different reasoning">Same view, different reasoning</span>
+              <span class="chip" data-target="surpriseInput" data-val="A counter-argument that was stronger than I expected">Stronger counter-argument</span>
+              <span class="chip" data-target="surpriseInput" data-val="Most people disagreed with me">Most people disagreed with me</span>
+            </div>
+            <textarea id="surpriseInput" rows="2" placeholder="Describe what surprised you…" style="margin-top:6px"></textarea>
+          </div>
+        </div>
+
+        <div class="reflection-section">
+          <div class="reflection-section-title">How did your thinking shift?</div>
+          <div class="prompt-item">
+            <div class="prompt-label">Mind-shift meter — how much did your view change?</div>
+            <div class="shift-meter">
+              <input type="range" id="shiftInput" min="0" max="4" step="1" value="0" style="flex:1" />
+              <span class="conf-badge" id="shiftLabel" style="min-width:90px">No change</span>
+            </div>
+            <div class="shift-labels"><span>No change</span><span>Completely changed</span></div>
+          </div>
+          <div class="prompt-item" style="margin-top:.75rem">
+            <div class="prompt-label">Revised view <span style="color:var(--ink3);font-weight:300">(optional)</span></div>
+            <textarea id="revisionInput" rows="3" placeholder="Has your position changed? Write an updated view…"></textarea>
+          </div>
+        </div>
+
+        <div class="reflection-section">
+          <div class="reflection-section-title">How did you learn?</div>
+          <div class="prompt-item">
+            <div class="prompt-label">What caused your thinking to shift (or stay the same)?</div>
+            <div class="prompt-chips" id="reasonChips">
+              <span class="chip" data-target="changeReasonInput" data-val="A well-reasoned argument changed my mind">Well-reasoned argument</span>
+              <span class="chip" data-target="changeReasonInput" data-val="New evidence or facts I wasn't aware of">New evidence / facts</span>
+              <span class="chip" data-target="changeReasonInput" data-val="Someone challenged an assumption I was making">My assumption was challenged</span>
+              <span class="chip" data-target="changeReasonInput" data-val="Hearing others' experience made it more real">Others' lived experience</span>
+              <span class="chip" data-target="changeReasonInput" data-val="I found more evidence that confirmed my view">My view was confirmed</span>
+            </div>
+            <textarea id="changeReasonInput" rows="2" placeholder="Explain what influenced your thinking…" style="margin-top:6px"></textarea>
+          </div>
+          <div class="prompt-item">
+            <div class="prompt-label">One question you still have after this discussion</div>
+            <textarea id="lingeringInput" rows="2" placeholder="What are you still unsure about?"></textarea>
+          </div>
+        </div>
+
+        <button class="btn-post" id="saveReflectionBtn" style="background:var(--green)">Save Reflection →</button>
+      </div>
+    </div>
+
+    <!-- Feed -->
+    <div class="card">
+      <div class="feed-header">
+        <div class="card-title" style="margin-bottom:0"><span class="card-icon icon-feed">💬</span>Anonymous Opinions</div>
+        <select class="sort-select" id="sortBy">
+          <option value="top">Top voted</option>
+          <option value="new">Newest first</option>
+        </select>
+      </div>
+      <ul class="opinions-list" id="opinionsList"></ul>
+    </div>
+
+  </div>
+
+  <!-- Bottom row: insights -->
+  <div class="bottom-section">
+    <div class="card">
+      <div class="card-title"><span class="card-icon icon-insights">📊</span>Metacognition Insights</div>
+      <div class="insights-grid" id="insightsGrid"></div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;justify-content:center;padding:1.5rem 1.75rem">
+      <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;margin-bottom:.6rem">How to use</div>
+      <ul style="font-size:13px;color:var(--ink2);line-height:1.8;padding-left:1.1rem">
+        <li>Teacher posts the discussion topic on the board</li>
+        <li>Students type their opinion and post anonymously</li>
+        <li>Everyone reads all opinions and votes on the best ones</li>
+        <li>Students optionally revise their view after reading others</li>
+        <li>Insights panel tracks how thinking evolved</li>
+      </ul>
+      <p style="font-size:11.5px;color:var(--ink3);margin-top:1rem">All data stays in this browser — fully offline demo.</p>
+    </div>
+  </div>
+
+</main>
+
+<template id="opinionTemplate">
+  <li class="opinion-item">
+    <div class="opinion-anon">🎭 Anonymous</div>
+    <div class="opinion-content opinion-text"></div>
+    <div class="revision-wrap" style="display:none">
+      <div class="opinion-revision">
+        <div class="opinion-revision-label">Revised view</div>
+        <div class="revision-content"></div>
+      </div>
+    </div>
+    <div class="change-wrap" style="display:none">
+      <div class="opinion-change-reason">
+        <div class="opinion-change-label">What changed my thinking</div>
+        <div class="change-reason-content"></div>
+      </div>
+    </div>
+    <div class="lingering-wrap" style="display:none">
+      <div class="opinion-change-reason" style="background:#f5f0fa;border-left-color:#7a52b0">
+        <div class="opinion-change-label" style="color:#7a52b0">Still wondering…</div>
+        <div class="lingering-content"></div>
+      </div>
+    </div>
+    <div class="opinion-meta">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="stamp"></span>
+        <span class="conf-pip"></span>
+        <span class="shift-tag" style="display:none;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500"></span>
+      </div>
+      <div class="vote-group">
+        <button class="vote-btn agree-btn" type="button">▲ Agree <span class="vote-count">0</span></button>
+        <button class="vote-btn disagree-btn disagree" type="button">▼ Disaggree <span class="disagree-count">0</span></button>
+      </div>
+    </div>
+  </li>
+</template>
+
+<script>
+const STORAGE_KEY = "socratic-board-demo-v1";
+let state = loadState();
+let pendingOpinionId = null; // track which opinion the reflection belongs to
+
+function loadState(){
+  const fallback={topic:"",opinions:[]};
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw) return fallback;
+    const p=JSON.parse(raw);
+    if(!p||typeof p!=="object") return fallback;
+    if(!Array.isArray(p.opinions)) p.opinions=[];
+    if(typeof p.topic!=="string") p.topic="";
+    return p;
+  }catch{return fallback;}
+}
+function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+
+function showToast(msg,color){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.style.background=color||"var(--ink)";
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2400);
+}
+
+function switchPhase(n){
+  document.getElementById("phase1").classList.toggle("active",n===1);
+  document.getElementById("phase2").classList.toggle("active",n===2);
+  document.getElementById("tab1Btn").classList.toggle("active",n===1);
+  document.getElementById("tab2Btn").classList.toggle("active",n===2);
+}
+
+// Chip click handler
+document.querySelectorAll(".chip").forEach(chip=>{
+  chip.addEventListener("click",()=>{
+    const targetId=chip.dataset.target;
+    const val=chip.dataset.val;
+    const ta=document.getElementById(targetId);
+    // toggle chip selection within its group
+    const group=chip.closest(".prompt-chips");
+    group.querySelectorAll(".chip").forEach(c=>{
+      if(c.dataset.target===targetId) c.classList.remove("selected");
+    });
+    if(ta.value===val){
+      ta.value="";
+    } else {
+      chip.classList.add("selected");
+      ta.value=val;
+    }
+  });
+});
+
+// Mind-shift slider labels
+const shiftLabels=["No change","Slightly shifted","Noticeably shifted","Significantly changed","Completely changed"];
+const shiftColors=["var(--ink3)","#2a7a52","#1e5fa5","#c8460a","#8b00d0"];
+document.getElementById("shiftInput").addEventListener("input",e=>{
+  const v=parseInt(e.target.value);
+  const lbl=document.getElementById("shiftLabel");
+  lbl.textContent=shiftLabels[v];
+  lbl.style.color=shiftColors[v];
+  lbl.style.background=v===0?"var(--paper2)":"#fff";
+  const pct=(v/4*100)+"%";
+  e.target.style.setProperty("--pct",pct);
+});
+// init shift slider
+(()=>{const s=document.getElementById("shiftInput");s.style.setProperty("--pct","0%")})();
+
+function renderTopic(){
+  const d=document.getElementById("topicDisplay");
+  if(state.topic.trim()){
+    d.textContent=state.topic;
+    d.classList.remove("empty");
+  } else {
+    d.textContent="No topic set yet — teacher can add one below.";
+    d.classList.add("empty");
+  }
+  document.getElementById("topicInput").value=state.topic;
+}
+
+function formatDate(ts){
+  return new Date(ts).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+}
+
+function makePips(conf){
+  let html="";
+  for(let i=1;i<=5;i++) html+=`<span class="pip${i<=conf?" filled":""}"></span>`;
+  return html;
+}
+
+const shiftTagColors=[
+  null,
+  {bg:"#edf7f2",text:"#2a7a52",label:"Slight shift"},
+  {bg:"#e8f0fb",text:"#1e5fa5",label:"Noticeable shift"},
+  {bg:"#fff5f2",text:"var(--accent)",label:"Big shift"},
+  {bg:"#f5f0fa",text:"#7a52b0",label:"Complete change"},
+];
+
+function renderOpinions(){
+  const list=document.getElementById("opinionsList");
+  const sort=document.getElementById("sortBy").value;
+  const items=[...state.opinions];
+  if(sort==="top") items.sort((a,b)=>(b.votes-(b.disagrees||0))-(a.votes-(a.disagrees||0))||b.createdAt-a.createdAt);
+  else items.sort((a,b)=>b.createdAt-a.createdAt);
+
+  if(!items.length){
+    list.innerHTML=`<div class="empty-state"><div class="empty-icon">💭</div>No opinions yet — be the first to share anonymously.</div>`;
+    return;
+  }
+
+  list.innerHTML="";
+  const tmpl=document.getElementById("opinionTemplate");
+
+  for(const item of items){
+    const node=tmpl.content.cloneNode(true);
+    node.querySelector(".opinion-content").textContent=item.text;
+
+    // Revised view
+    const rWrap=node.querySelector(".revision-wrap");
+    if(item.revision&&item.revision.trim()){
+      node.querySelector(".revision-content").textContent=item.revision;
+      rWrap.style.display="block";
+    }
+
+    // What changed
+    const cWrap=node.querySelector(".change-wrap");
+    if(item.changeReason&&item.changeReason.trim()){
+      node.querySelector(".change-reason-content").textContent=item.changeReason;
+      cWrap.style.display="block";
+    }
+
+    // Lingering question
+    const lWrap=node.querySelector(".lingering-wrap");
+    if(item.lingering&&item.lingering.trim()){
+      node.querySelector(".lingering-content").textContent=item.lingering;
+      lWrap.style.display="block";
+    }
+
+    // Mind-shift tag
+    const stag=node.querySelector(".shift-tag");
+    const sv=item.mindShift||0;
+    if(sv>0&&shiftTagColors[sv]){
+      const tc=shiftTagColors[sv];
+      stag.textContent=tc.label;
+      stag.style.background=tc.bg;
+      stag.style.color=tc.text;
+      stag.style.border=`1px solid ${tc.bg}`;
+      stag.style.display="inline-block";
+    }
+
+    node.querySelector(".stamp").textContent=formatDate(item.createdAt);
+    node.querySelector(".conf-pip").innerHTML=makePips(item.confidence);
+    node.querySelector(".vote-count").textContent=String(item.votes);
+    node.querySelector(".disagree-count").textContent=String(item.disagrees||0);
+
+    const agreeBtn=node.querySelector(".agree-btn");
+    const disagreeBtn=node.querySelector(".disagree-btn");
+    if(item.myVote) agreeBtn.classList.add("voted");
+    if(item.myDisagree) disagreeBtn.classList.add("voted");
+
+    agreeBtn.addEventListener("click",()=>{
+      const t=state.opinions.find(e=>e.id===item.id);
+      if(!t) return;
+      if(t.myVote){
+        t.votes--;
+        t.myVote=false;
+      } else {
+        t.votes++;
+        t.myVote=true;
+        if(t.myDisagree){
+          t.disagrees=(t.disagrees||0)-1;
+          t.myDisagree=false;
+        }
+      }
+      saveState();renderOpinions();renderInsights();
+    });
+
+    disagreeBtn.addEventListener("click",()=>{
+      const t=state.opinions.find(e=>e.id===item.id);
+      if(!t) return;
+      if(t.myDisagree){
+        t.disagrees=(t.disagrees||0)-1;
+        t.myDisagree=false;
+      } else {
+        t.disagrees=(t.disagrees||0)+1;
+        t.myDisagree=true;
+        if(t.myVote){
+          t.votes--;
+          t.myVote=false;
+        }
+      }
+      saveState();renderOpinions();renderInsights();
+    });
+
+    list.appendChild(node);
+  }
+}
+
+function renderInsights(){
+  const total=state.opinions.length;
+  const reflected=state.opinions.filter(e=>e.hasReflection).length;
+  const changedMind=state.opinions.filter(e=>(e.mindShift||0)>=2).length;
+  const avgConf=total?(state.opinions.reduce((s,e)=>s+(Number(e.confidence)||0),0)/total).toFixed(1):"—";
+  const lingering=state.opinions.filter(e=>e.lingering&&e.lingering.trim()).length;
+
+  const grid=document.getElementById("insightsGrid");
+  const totalVotes=state.opinions.reduce((s,e)=>s+e.votes+(e.disagrees||0),0);
+  const stats=[
+    {num:total,label:"Total opinions"},
+    {num:avgConf+"/5",label:"Avg. confidence"},
+    {num:reflected,label:"Completed reflection"},
+    {num:changedMind,label:"Noticeably shifted view"},
+    {num:lingering,label:"Lingering questions"},
+    {num:totalVotes,label:"Votes cast"},
+  ];
+  grid.innerHTML=stats.map(s=>`
+    <div class="insight-stat">
+      <div class="insight-num">${s.num}</div>
+      <div class="insight-label">${s.label}</div>
+    </div>`).join("");
+}
+
+// ── TOPIC ──
+document.getElementById("setTopicBtn").addEventListener("click",()=>{
+  const v=document.getElementById("topicInput").value.trim();
+  state.topic=v;saveState();renderTopic();
+  if(v) showToast("Topic posted to the board!");
+});
+document.getElementById("topicInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter") document.getElementById("setTopicBtn").click();
+});
+
+// ── POST OPINION (Phase 1) ──
+document.getElementById("postOpinionBtn").addEventListener("click",()=>{
+  const text=document.getElementById("opinionInput").value.trim();
+  const confidence=Number(document.getElementById("confidenceInput").value);
+  if(!text){showToast("Please write an opinion first.");return;}
+  if(!state.topic){showToast("No topic set yet — ask the teacher to post one.");return;}
+
+  const id=crypto.randomUUID();
+  pendingOpinionId=id;
+  state.opinions.push({
+    id,text,confidence,votes:0,disagrees:0,myVote:false,myDisagree:false,createdAt:Date.now(),hasReflection:false
+  });
+
+  document.getElementById("opinionInput").value="";
+  const ci=document.getElementById("confidenceInput");
+  ci.value=3;updateSlider(ci);
+  document.getElementById("confidenceLabel").textContent="3 / 5";
+
+  saveState();renderOpinions();renderInsights();
+  showToast("Opinion posted! Now read others, then Reflect →","var(--green)");
+  switchPhase(2);
+});
+
+// ── SAVE REFLECTION (Phase 2) ──
+document.getElementById("saveReflectionBtn").addEventListener("click",()=>{
+  const revision=document.getElementById("revisionInput").value.trim();
+  const changeReason=document.getElementById("changeReasonInput").value.trim();
+  const surprise=document.getElementById("surpriseInput").value.trim();
+  const lingering=document.getElementById("lingeringInput").value.trim();
+  const mindShift=parseInt(document.getElementById("shiftInput").value);
+
+  // attach to most recent opinion from this session or the pending one
+  const targetId=pendingOpinionId||( state.opinions.length ? state.opinions[state.opinions.length-1].id : null);
+  if(!targetId){showToast("Post an opinion first before saving reflection.");return;}
+
+  const t=state.opinions.find(e=>e.id===targetId);
+  if(t){
+    t.revision=revision;
+    t.changeReason=changeReason;
+    t.surprise=surprise;
+    t.lingering=lingering;
+    t.mindShift=mindShift;
+    t.hasReflection=true;
+  }
+
+  // reset reflection fields
+  document.getElementById("revisionInput").value="";
+  document.getElementById("changeReasonInput").value="";
+  document.getElementById("surpriseInput").value="";
+  document.getElementById("lingeringInput").value="";
+  const si=document.getElementById("shiftInput");
+  si.value=0;si.style.setProperty("--pct","0%");
+  document.getElementById("shiftLabel").textContent="No change";
+  document.querySelectorAll(".chip.selected").forEach(c=>c.classList.remove("selected"));
+
+  saveState();renderOpinions();renderInsights();
+  showToast("Reflection saved!","var(--green)");
+  switchPhase(1);
+  pendingOpinionId=null;
+});
+
+// ── RESET ──
+document.getElementById("clearAllBtn").addEventListener("click",()=>{
+  if(!confirm("Reset demo? This will delete the topic and all opinions.")) return;
+  state={topic:"",opinions:[]};pendingOpinionId=null;
+  saveState();renderTopic();renderOpinions();renderInsights();
+  switchPhase(1);
+  showToast("Demo reset.");
+});
+
+document.getElementById("sortBy").addEventListener("change",renderOpinions);
+
+const ci=document.getElementById("confidenceInput");
+function updateSlider(el){
+  const pct=((el.value-el.min)/(el.max-el.min)*100)+"%";
+  el.style.setProperty("--pct",pct);
+}
+ci.addEventListener("input",e=>{
+  document.getElementById("confidenceLabel").textContent=`${e.target.value} / 5`;
+  updateSlider(e.target);
+});
+updateSlider(ci);
+
+renderTopic();renderOpinions();renderInsights();
+</script>
+</body>
+</html>
